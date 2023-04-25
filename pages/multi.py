@@ -3,12 +3,14 @@ from utils import auth
 import requests
 import json
 
-entry = 'http://stylishdao.csie.org:3000/api/1.0/products/create'
+entry   = 'http://stylishdao.csie.org:3000/api/1.0/products/create'
+linebot = 'https://29b8-59-120-11-125.ngrok-free.app//test'
 
 def handle_sheet(url='https://docs.google.com/spreadsheets/d/1XElQspBztCtSHUG6BXZVoWFetkhh9J_817rciOKcI18/edit#gid=0'):
     sheet = auth.authenticate(url)
     sh = sheet.worksheets()[0]
     content = sh.get_all_values()
+    ids = []
     for i in range(len(content)):
         if not content[i][0]: break
         data = {
@@ -29,7 +31,12 @@ def handle_sheet(url='https://docs.google.com/spreadsheets/d/1XElQspBztCtSHUG6BX
         }
         response = requests.post(entry, data=data)
         st.json(response.json())
+        ids.append(content[i][0])
     sh.clear()
+    d = {
+        'id': ids
+    }
+    res = requests.post(linebot, data=json.dumps(d))
     return
 
 
